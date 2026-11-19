@@ -5,17 +5,9 @@ import { createFollowCamera } from './js/follow-camera.js';
 import { createDayNightCycle } from './js/day-night.js';
 import { createInteractionOutline } from './js/interaction-outline.js';
 
-const canvas = document.querySelector('#scene');
-try {
-  startScene(new THREE.WebGLRenderer({ canvas, antialias: true, stencil: true }));
-} catch (error) {
-  document.querySelector('#error').hidden = false;
-  console.error(error);
-}
-
-function startScene(renderer) {
+export function createViewport(canvas) {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, stencil: true });
   const scene = new THREE.Scene();
-  const outline = createInteractionOutline(renderer);
   scene.background = new THREE.Color(0xffffff);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.localClippingEnabled = true;
@@ -23,6 +15,57 @@ function startScene(renderer) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const camera = new THREE.PerspectiveCamera(34, 1, 0.05, 350);
   camera.up.set(0, 0, 1);
+  scene.fog = new THREE.Fog(0xffffff, 18, 90);
+
+  // Short segments keep the grid visible when the camera looks across the near plane.
+  const gridVertices = [];
+  const xVertices = [];
+  const yVertices = [];
+  for (let cross = -120; cross <= 120; cross++) {
+    const horizontal = cross === 0 ? xVertices : gridVertices;
+    const vertical = cross === 0 ? yVertices : gridVertices;
+    for (let from = -120; from < 120; from += 12) {
+      horizontal.push(from, cross, 0, from + 12, cross, 0);
+      vertical.push(cross, from, 0, cross, from + 12, 0);
+    }
+  }
+  function addLines(vertices, color, opacity) {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    const material = new THREE.LineBasicMaterial({ color, opacity, transparent: true });
+    const lines = new THREE.LineSegments(geometry, material);
+    scene.add(lines);
+    return lines;
+  }
+  const grid = addLines(gridVertices, 0xb1b3bf, 0.82);
+  const horizontalAxis = addLines(xVertices, 0xd88c90, 0.5);
+  const verticalAxis = addLines(yVertices, 0x81bb9d, 0.5);
+  horizontalAxis.position.z = verticalAxis.position.z = 0.012;
+
+  function resize() {
+    const { clientWidth: width, clientHeight: height } = canvas;
+    camera.aspect = width / Math.max(1, height);
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height, false);
+  }
+  resize();
+  new ResizeObserver(resize).observe(canvas);
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  camera.position.set(12, -17, 3.1);
+  camera.lookAt(0, 0, 3.7);
+  renderer.setAnimationLoop(now => {
+    camera.position.x = 12 + (reducedMotion.matches ? 0 : 1.4 * Math.sin(now * 0.00008));
+    renderer.render(scene, camera);
+  });
+  return () => startScene(canvas, renderer, scene, camera, grid, horizontalAxis.material, verticalAxis.material);
+}
+
+function startScene(canvas, renderer, scene, camera, grid, xAxis, yAxis) {
+  const outline = createInteractionOutline(renderer);
+  grid.material.color.set(0xdbdce3);
+  scene.fog.near = 45;
+  scene.fog.far = 170;
   const direction = new THREE.Vector3();
   const right = new THREE.Vector3();
   const motion = new THREE.Vector3();
@@ -34,22 +77,6 @@ function startScene(renderer) {
     direction.set(Math.cos(yaw) * Math.cos(pitch), Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch));
     camera.lookAt(lookPoint.copy(camera.position).add(direction));
   }
-  const grid = new THREE.GridHelper(240, 240, 0xdbdce3, 0xdbdce3);
-  grid.rotation.x = Math.PI / 2;
-  grid.material.transparent = true;
-  grid.material.opacity = 0.66;
-  scene.add(grid);
-  scene.fog = new THREE.Fog(0xffffff, 45, 170);
-
-  function axis(end, color) {
-    const geometry = new THREE.BufferGeometry().setFromPoints([end.clone().negate(), end]);
-    const line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color, transparent: true }));
-    line.position.z = 0.012;
-    scene.add(line);
-    return line.material;
-  }
-  const xAxis = axis(new THREE.Vector3(120, 0, 0), 0xd88c90);
-  const yAxis = axis(new THREE.Vector3(0, 120, 0), 0x81bb9d);
   const updateDayNight = createDayNightCycle(scene);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(240, 240), new THREE.ShadowMaterial({ color: 0x494355, opacity: 0.13 }));
   floor.position.z = 0.006;
@@ -200,18 +227,10 @@ function startScene(renderer) {
     });
   }
 
-  function resize() {
-    const { clientWidth: width, clientHeight: height } = canvas;
-    camera.aspect = width / Math.max(1, height);
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height, false);
-  }
-  resize();
   const distance = Math.max(12.7, 10.8 / (2 * Math.tan(THREE.MathUtils.degToRad(17)) * camera.aspect));
   updateLook();
   camera.position.set(0, 0, 0.85).addScaledVector(direction, -distance);
   let cameraClearance = camera.position.z;
-  new ResizeObserver(resize).observe(canvas);
 
   const followEve = createFollowCamera(camera);
 

@@ -3,14 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Three.js scene</title>
+  <meta name="theme-color" content="#ffffff">
+  <title>Harold &amp; Eve</title>
   <link rel="stylesheet" href="style.css">
   <link rel="license" href="characters/harold/license.txt" title="Harold model credit">
   <link rel="license" href="characters/eve/license.txt" title="Eve model credit">
 </head>
 <body>
-  <canvas id="scene" tabindex="0" aria-label="3D viewport. Hold the right mouse button and drag to look around. During the opening, WASD moves the camera and Q/E changes its height. After the terrain rises, WASD moves Eve or gets her up from sitting. Hold Shift and W to run forward. E jumps and Q sits or stands. Click a nearby chair or sofa to watch Eve walk over and sit. Click a rocker on a wall switchboard to turn its lights off or on."></canvas>
+  <main id="landing">
+    <div class="masthead">
+      <h1 aria-label="Harold &amp; Eve">
+        <img class="harold" src="assets/harold-wordmark.png" alt="Harold" width="1539" height="804">
+        <span class="ampersand">&amp;</span>
+        <img class="eve" src="assets/eve-wordmark.svg" alt="EVE" width="246" height="104">
+      </h1>
+      <button id="start" type="button"><span class="play" aria-hidden="true"></span>Start</button>
+    </div>
+    <div class="project">
+      <h2>Architecture as a playable world</h2>
+      <p class="twin">building a digital twin</p>
+      <p class="space">inside design space</p>
+      <p class="working-title">(im still figuring out a project title)</p>
+    </div>
+  </main>
+  <canvas id="scene" inert tabindex="0" aria-label="3D viewport. Hold the right mouse button and drag to look around. During the opening, WASD moves the camera and Q/E changes its height. After the terrain rises, WASD moves Eve or gets her up from sitting. Hold Shift and W to run forward. E jumps and Q sits or stands. Click a nearby chair or sofa to sit, or the bed to lie down. Click a door or light switch to operate it."></canvas>
   <p id="error" role="alert" hidden>This scene needs WebGL. Enable hardware acceleration in your browser and reload.</p>
-  <script type="module" src="main.js"></script>
+  <script type="module" src="js/landing.js"></script>
 </body>
 </html>

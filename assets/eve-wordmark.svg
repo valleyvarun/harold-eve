@@ -1,0 +1,27 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 246 104" role="img" aria-labelledby="title">
+  <title id="title">EVE</title>
+  <defs>
+    <linearGradient id="front" x2=".37" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#eeeeee"/>
+      <stop offset=".65" stop-color="#d6d6d6"/>
+      <stop offset="1" stop-color="#c6c6c6"/>
+    </linearGradient>
+    <g id="e">
+      <path fill="#fafafa" d="M0 16 14 3h62L62 16Z M20 48l14-13h34L54 48Z M20 82l14-13h42L62 82Z"/>
+      <path fill="#858585" d="m62 16 14-13v18L62 34Z M20 34l14-13v14L20 48Z M54 48l14-13v17L54 65Z M20 65l14-13v17L20 82Z M62 82l14-13v19L62 101Z"/>
+      <path fill="url(#front)" d="M0 16h62v18H20v14h34v17H20v17h42v19H0Z"/>
+      <path fill="none" stroke="#ffffff" stroke-width=".85" d="M1.4 99V17.4h59.2 M21.4 49.4h31.2 M21.4 83.4h39.2"/>
+    </g>
+  </defs>
+  <g stroke="#424242" stroke-width="1.1" stroke-linejoin="round">
+    <use href="#e" x="1.5"/>
+    <g transform="translate(80)">
+      <path fill="#fafafa" d="m0 16 14-13h22L22 16Z M52 16 66 3h22L74 16Z"/>
+      <path fill="#999999" d="M22 16 36 3l15 53-14 13Z"/>
+      <path fill="#737373" d="M74 16 88 3l-24 85-14 13Z"/>
+      <path fill="url(#front)" d="M0 16h22l15 53 15-53h22l-24 85H24Z"/>
+      <path fill="none" stroke="#ffffff" stroke-width=".85" d="M24.8 98.6 1.8 17.4h19.3 M38.2 69l14.9-51.6h19"/>
+    </g>
+    <use href="#e" x="168.5"/>
+  </g>
+</svg>
